@@ -10,8 +10,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse #Responses
 #Personal imports
 from .pydModels import *
 
-#Current directory
-baseDir = str(os.getcwd())
+
 #Server Initialization
 app = FastAPI() #initialize FastAPI
 sub = FastAPI() #for backend servicing
@@ -19,7 +18,7 @@ app.mount("/api", sub) #mount sub to handle backend stuff
 templates = Jinja2Templates(directory="app/static")
 
 #CORS initialization
-origins = [ #Set the origins
+origins:list = [ #Set the origins
     "http://localhost:80",
     "http://localhost:3000",
     "http://localhost:8000",
@@ -72,18 +71,19 @@ async def helloWorld():
 @sub.post("/validate")
 async def emailValidator(check:EmailCheck):
     try:
-        emailinfo = validate_email(check.email, check_deliverability=check.verify)
-        normalizedEmail = emailinfo.normalized
+        emailinfo:object = validate_email(check.email, check_deliverability=check.verify)
+        normalizedEmail:str = emailinfo.normalized
         return normalizedEmail
     except EmailNotValidError as e:
         return(str(e))
 
 
 #CRUD check
+
 #Request a specific greeting
 @sub.get("/{filename}")#greet person by name and return their request body
-async def helloGetter(filename: str):
-    getterTarget =  "./static/"+filename+".json" #request params
+async def helloGetter(filename:str):
+    getterTarget:str =  "./static/"+filename+".json" #request params
     if(os.path.exists(getterTarget)):
         #f = open(getterTarget)
         #output = json.load(f)
@@ -91,10 +91,11 @@ async def helloGetter(filename: str):
         return {"Hello": filename}#str(output)
     else:
         return 0
+
 #Post new file if name is unused
 @sub.post("/{filename}")
-async def helloPoster(filename: str, body:Union[List,Dict,Any]=None):
-    posterTarget =  "./static/"+filename+".json" #request params
+async def helloPoster(filename:str, body:Union[List,Dict,Any]=None):
+    posterTarget:str =  "./static/"+filename+".json" #request params
     if(not(os.path.exists(posterTarget))):
         #f = open(posterTarget, "x")#"x" creates a new file if it didn't exist before
         #output = json.dump(f)
@@ -102,10 +103,11 @@ async def helloPoster(filename: str, body:Union[List,Dict,Any]=None):
         return "posted"
     else:
         return 0
+
 #Overwrite specified file
 @sub.put("/{filename}")
-async def helloPutter(filename: str, body:Union[List,Dict,Any]=None):
-    putterTarget =  "./static/"+filename+".json" #request params
+async def helloPutter(filename:str, body:Union[List,Dict,Any]=None):
+    putterTarget:str =  "./static/"+filename+".json" #request params
     if(os.path.exists(putterTarget)):
         #f = open(putterTarget) #open an existing file to change it
         #output = json.dump(f)
@@ -113,10 +115,11 @@ async def helloPutter(filename: str, body:Union[List,Dict,Any]=None):
         return "putted"
     else:
         return 0
+
 #Delete specified file
 @sub.delete("/{filename}")
-async def helloRemover(filename: str):
-    removerTarget =  "./static/"+filename+".json" #request params
+async def helloRemover(filename:str):
+    removerTarget:str =  "./static/"+filename+".json" #request params
     if(os.path.exists(removerTarget)):
         os.remove(removerTarget) #removed the file if it still
         return "deleted"
