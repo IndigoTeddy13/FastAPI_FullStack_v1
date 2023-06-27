@@ -1,14 +1,37 @@
 #Imports
 import os, json #filepaths, JSONs
+#import uvicorn #runtime environment
 from typing import Any, Dict, List, Union #different types
+from email_validator import validate_email, EmailNotValidError #email validation
 from fastapi import FastAPI, Request #FastAPI stuff
+from starlette.middleware.cors import CORSMiddleware #Allow CORS
 from fastapi.templating import Jinja2Templates #Routing/templating HTML files
 from fastapi.responses import HTMLResponse, RedirectResponse #Responses
+#Personal imports
+from pydModels import *
+
 #Server Initialization
 app = FastAPI() #initialize FastAPI
 sub = FastAPI() #for backend servicing
 app.mount("/api", sub) #mount sub to handle backend stuff
 templates = Jinja2Templates(directory="static")
+
+#CORS initialization
+origins = [ #Set the origins
+    "http://localhost:80",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8080"
+]
+#Use CORSMiddleware to ensure CORS is permitted on this server
+app.add_middleware(
+    CORSMiddleware,  
+    allow_origins=origins,
+    allow_credentials=True, 
+    allow_methods=["*"], #set methods
+    allow_headers=["*"]
+)
+
 
 #API calls:
 #Frontend calls
@@ -33,13 +56,10 @@ async def index(request: Request, filename: str): #default page
     elif("." in filename):
         return RedirectResponse(url="/"+filename.split(".")[0])
     #Last resorts
+    elif(filename=="api"):
+        return RedirectResponse(url="/api/")
     else:
-        #If forgot to write "/" after "/api"
-        if(filename=="api"):
-            return RedirectResponse(url="/api/")
-        #otherwise, redirect to home page for safety (might reroute to an error page later on)
-        else:
-            return RedirectResponse(url="/")
+        return RedirectResponse(url="/")
 
 #Backend API calls
 #Handled by the "sub" app
@@ -47,8 +67,19 @@ async def index(request: Request, filename: str): #default page
 #Request a Hello World JSON
 @sub.get("/")
 async def helloWorld():
-    return {"Hello": "World"}
+    return {"Hello":"World"}
+#Email validation
+@sub.post("/validate")
+async def emailValidator(check:EmailCheck):
+    try:
+        emailinfo = validate_email(check.email, check_deliverability=check.verify)
+        normalizedEmail = emailinfo.normalized
+        return normalizedEmail
+    except EmailNotValidError as e:
+        return(str(e))
 
+
+#CRUD check
 #Request a specific greeting
 @sub.get("/{filename}")#greet person by name and return their request body
 async def helloGetter(filename: str):
@@ -91,4 +122,9 @@ async def helloRemover(filename: str):
         return "deleted"
     else:
         return 0
+
+
+#Programatically run uvicorn:
+#if (__name__ == "__main__"):
+#    uvicorn.run("main:app", host="localhost", port=int(os.environ.get('PORT', 8000)), log_level="info", reload=True)
 #Gotta check out how to set up port and IP manually later
