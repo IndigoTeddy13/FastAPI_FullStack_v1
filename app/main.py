@@ -8,13 +8,15 @@ from starlette.middleware.cors import CORSMiddleware #Allow CORS
 from fastapi.templating import Jinja2Templates #Routing/templating HTML files
 from fastapi.responses import HTMLResponse, RedirectResponse #Responses
 #Personal imports
-from pydModels import *
+from .pydModels import *
 
+#Current directory
+baseDir = str(os.getcwd())
 #Server Initialization
 app = FastAPI() #initialize FastAPI
 sub = FastAPI() #for backend servicing
 app.mount("/api", sub) #mount sub to handle backend stuff
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="app/static")
 
 #CORS initialization
 origins = [ #Set the origins
@@ -33,33 +35,31 @@ app.add_middleware(
 )
 
 
-#API calls:
+#API calls
 #Frontend calls
 
-#Homepage
+#Main page
 @app.get('/', response_class=HTMLResponse)
 async def index(request: Request): #default page
     return templates.TemplateResponse("index.html", {"request": request})
+#Index reroute
+@app.get('/index', response_class=HTMLResponse)
+@app.get('/index.html', response_class=HTMLResponse)
+async def indexReroute(request: Request): #default page
+    return RedirectResponse(url="/")
+#Reroute if typing "/api"
+@app.get('/api', response_class=HTMLResponse)
+async def apiReroute(request: Request): #default page
+    return RedirectResponse(url="/api/")
+#aaa page
+@app.get('/aaa', response_class=HTMLResponse)
+async def aaa(request: Request): #default page
+    return templates.TemplateResponse("aaa.html", {"request": request})
+#aaa reroute
+@app.get('/aaa.html', response_class=HTMLResponse)
+async def aaaReroute(request: Request):
+    return RedirectResponse(url="/aaa")
 
-#Frontend page servicing
-@app.get('/{filename}', response_class=HTMLResponse)
-async def index(request: Request, filename: str): #default page
-    #if the .html file exists
-    if(os.path.isfile("./static/"+filename+".html")):
-        #Homepage redirect
-        if(filename=="index"):
-            return RedirectResponse(url="/")
-        #Direct to requested HTML page
-        else:
-            return templates.TemplateResponse(filename+".html", {"request": request})
-    #Redirect to fix URL endpoint
-    elif("." in filename):
-        return RedirectResponse(url="/"+filename.split(".")[0])
-    #Last resorts
-    elif(filename=="api"):
-        return RedirectResponse(url="/api/")
-    else:
-        return RedirectResponse(url="/")
 
 #Backend API calls
 #Handled by the "sub" app
