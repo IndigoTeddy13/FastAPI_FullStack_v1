@@ -16,11 +16,11 @@ async function fetcher(url, method, body){
 
 
 btn.onclick = async ()=>{
-    results = await fetcher("http://localhost:80/api/", "GET", /*{
+    results = await fetcher("http://fastapi.localhost:80/", "GET", /*{
         "myname":"Jotaro Kujo",
         "standname": "Star Platinum"
     }*/);
-    await console.log(results);
-    await alert(JSON.stringify(results));
+    console.log(results);
+    alert(JSON.stringify(results));
 }
     

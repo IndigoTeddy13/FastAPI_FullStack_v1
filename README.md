@@ -16,7 +16,7 @@ uvicorn api.main:app --port 80 --reload
 After activating the backend, open an HTML file in the browser to get started. Currently might not work on some browsers.
 
 #Dockerization
-To run as a docker container, open main project directory and run the following commands, then go to http://localhost to visit the service:
+To run as a docker container, open main project directory and run the following commands, then go to http://fastapi.localhost to visit the service:
 ```bash
 docker-compose build
 ```
