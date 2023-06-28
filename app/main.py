@@ -22,7 +22,8 @@ origins:list = [ #Set the origins
     "http://localhost:80",
     "http://localhost:3000",
     "http://localhost:8000",
-    "http://localhost:8080"
+    "http://localhost:8080",
+    "http://fastapi.localhost:8008"
 ]
 #Use CORSMiddleware to ensure CORS is permitted on this server
 app.add_middleware(

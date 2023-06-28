@@ -11,11 +11,11 @@
     <script>
         const btn = document.getElementById("aaaaaa");
         btn.onclick = ()=>{
-            fetch("http://localhost:80/api/").then((Response) => {
+            fetch("/api/").then((Response) => {
                 return Response.json()
             }).then((data) => {
                 console.log(data);
-                alert(JSON.stringify(data, null, "\t"));
+                //alert(JSON.stringify(data, null, "\t"));
             })
         }
     </script>
