@@ -17,16 +17,10 @@ services:
   db:
     image: mongodb/mongodb-community-server
     container_name: mongodb
-    env_file:
-      - ./.env
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - ./data:/data/db
-#    environment:
-#      - POSTGRES_USER=fastapi_traefik
-#      - POSTGRES_PASSWORD=fastapi_traefik
-#      - POSTGRES_DB=fastapi_traefik
 #  traefik:
 #    image: traefik:v2.10
 #    container_name: traefik
@@ -36,6 +30,3 @@ services:
 #    volumes:
 #      - "./traefik.dev.toml:/etc/traefik/traefik.toml"
 #      - //var/run/docker.sock://var/run/docker.sock
-
-#volumes:
-#  postgres_data:

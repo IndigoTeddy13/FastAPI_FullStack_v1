@@ -9,16 +9,28 @@ from fastapi.responses import HTMLResponse, RedirectResponse #Responses
 #Personal imports
 from .pydModels import *
 
-
+#CORS PERMS:
+#Allow at least these origins
+origins:list = [
+    "http://localhost:8000",
+    "http://localhost:80",
+    "http:localhost:3000"
+]
+#Allow all kinds of methods
+methods:list = [
+    "GET", "POST", "PULL", "DELETE",
+    "PATCH", "HEAD", "OPTIONS",
+    "CONNECT", "TRACE"
+] 
 #Server Initialization
 app = FastAPI() #initialize FastAPI
 #Use CORSMiddleware to ensure CORS is permitted on this server
 app.add_middleware(
     CORSMiddleware,  
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True, 
-    allow_methods=["*"], #set methods
-    allow_headers=["*"]
+    allow_methods=methods,
+    allow_headers=["*"]#Not sure what headers to block, so allow all for now
 )
 
 
