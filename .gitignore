@@ -1,6 +1,14 @@
 #VS Code config
 .vscode
 
+#FUTURE PORTIONS:
+
+
+
+#PYTHON3 PORTION:
+
+#Generated DB
+data
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

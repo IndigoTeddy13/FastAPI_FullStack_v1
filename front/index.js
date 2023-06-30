@@ -16,7 +16,7 @@ async function fetcher(url, method, body){
 
 
 btn.onclick = async ()=>{
-    results = await fetcher("http://fastapi.localhost:80/", "GET", /*{
+    let results = await fetcher("http://localhost:80/", "GET", /*{
         "myname":"Jotaro Kujo",
         "standname": "Star Platinum"
     }*/);

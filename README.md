@@ -1,22 +1,15 @@
 # TestingFastAPIv1
-My first attempt at building a fullstack app for FastAPI. Not sure how I'll implement the frontend yet.
+My first attempt at building a fullstack app for FastAPI.
 
-## LocalHosting
-To run backend directly, open main project directory, install mandatory pip packages, and run the uvicorn command, then go to http://localhost to visit the service:
-```bash
-pip install --no-cache-dir --upgrade -r requirements.txt
-```
-```bash
-uvicorn app.main:app --port 80
-```
-Optional (to reload automatically after saving changes):
-```bash
-uvicorn app.main:app --port 80 --reload
-```
-After activating the backend, open an HTML file in the browser to get started. Currently might not work on some browsers due to wildcardiing in CORS.
+## Tech Stack
+* Backend: FastAPI
+* Frontend: Svelte (or maybe React, not sure yet)
+* DB: MongoDB
+* Reverse-Proxy (might remove this if I don't need it): Traefik
+* Runtime Environment: Docker
 
 ## Dockerization
-To run as a docker container, open main project directory and run the following commands, then go to http://fastapi.localhost to visit the service:
+To run as a docker container, open main project directory and run the following commands, then go to http://localhost to visit the service:
 ```bash
 docker-compose build
 ```
@@ -27,3 +20,6 @@ To turn the container off:
 ```bash
 docker-compose down
 ```
+
+## Mounts
+I already mounted the backend (app folder). Planning to mount the compilation target of the frontend. Also mounting MongoDB to ensure the content doesn't get lost when I close the image.
