@@ -1,20 +1,20 @@
 #Imports
 import os, json #filepaths, JSONs
-#import uvicorn #runtime environment
 from typing import Any, Dict, List, Union #different types
 from email_validator import validate_email, EmailNotValidError #email validation
-from fastapi import FastAPI, Request #FastAPI stuff
+from fastapi import FastAPI, HTTPException #FastAPI stuff
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
-from fastapi.responses import HTMLResponse, RedirectResponse #Responses
+from fastapi.responses import FileResponse # send text files to users
 #Personal imports
 from .pydModels import *
 
 #CORS PERMS:
 #Allow at least these origins
 origins:list = [
-    "http://localhost:8000",
     "http://localhost:80",
-    "http:localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8080"
 ]
 #Allow all kinds of methods
 methods:list = [
@@ -33,16 +33,23 @@ app.add_middleware(
     allow_headers=["*"]#Not sure what headers to block, so allow all for now
 )
 
+#Static file management router
+statRoute = FastAPI()
+app.mount("/static", statRoute)
+
+#MongoDB management router
+mongoRoute = FastAPI()
+app.mount("/db", mongoRoute)
 
 #API calls
 
 #Request a Hello World JSON
 @app.get("/")
-async def helloWorld():
+async def helloWorld()-> dict:
     return {"Hello":"World"}
 #Email validation
 @app.post("/validate")
-async def emailValidator(check:EmailCheck):
+async def emailValidator(check:EmailCheck)-> str:
     try:
         emailinfo:object = validate_email(check.email, check_deliverability=check.verify)
         normalizedEmail:str = emailinfo.normalized
@@ -50,56 +57,64 @@ async def emailValidator(check:EmailCheck):
     except EmailNotValidError as e:
         return(str(e))
 
-#CRUD check
+#Static CRUD check
 
 #Request a specific greeting
-@app.get("/{filename}")#greet person by name and return their request body
-async def helloGetter(filename:str):
-    getterTarget:str =  "./static/"+filename+".json" #request params
-    if(os.path.exists(getterTarget)):
-        #f = open(getterTarget)
-        #output = json.load(f)
-        #f.close()
-        return {"Hello": filename}#str(output)
+@statRoute.get("/{filename}")#greet person by name and return their request body
+async def helloGetter(filename:str)-> FileResponse:
+    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    if(os.path.exists(targetFile)):
+        output:str
+        with open(targetFile, 'r', encoding='utf-8') as f:
+            output = f.read()
+        return FileResponse(targetFile) #return file to user
     else:
-        return 0
+        raise HTTPException(status_code=404, detail="Item not found")
 
 #Post new file if name is unused
-@app.post("/{filename}")
-async def helloPoster(filename:str, body:Union[List,Dict,Any]=None):
-    posterTarget:str =  "./static/"+filename+".json" #request params
-    if(not(os.path.exists(posterTarget))):
-        #f = open(posterTarget, "x")#"x" creates a new file if it didn't exist before
-        #output = json.dump(f)
-        #f.close()
-        return "posted"
+@statRoute.post("/{filename}")
+async def helloPoster(filename:str, body:Textfile)-> str:
+    targetFile:str = filename+".txt" #request params
+    targetPath:str = os.path.join(os.getcwd(), "app", "static")
+    if (not(os.path.exists(targetPath))):
+        os.makedirs(targetPath)#make directory if it doesn't exist
+    newPath:str = targetPath+"/"+targetFile
+    if(not(os.path.exists(newPath))):
+        with open(newPath, 'w', encoding='utf-8') as f:
+            f.write(body.content)
+        return ("Posted "+ filename +" successfully!")
     else:
-        return 0
+        raise HTTPException(status_code=404, detail="Item already exists")
 
 #Overwrite specified file
-@app.put("/{filename}")
-async def helloPutter(filename:str, body:Union[List,Dict,Any]=None):
-    putterTarget:str =  "./static/"+filename+".json" #request params
-    if(os.path.exists(putterTarget)):
-        #f = open(putterTarget) #open an existing file to change it
-        #output = json.dump(f)
-        #f.close()
-        return "putted"
+@statRoute.put("/{filename}")
+async def helloPutter(filename:str, body:Textfile)-> str:
+    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    if(os.path.exists(targetFile)):
+        with open(targetFile, 'w', encoding='utf-8') as f:
+            f.write(body.content)
+        return ("Replaced "+ filename + " successfully!")
     else:
-        return 0
+        raise HTTPException(status_code=404, detail="Item not found")
+
+#Add to specified file
+@statRoute.patch("/{filename}")
+async def helloPatcher(filename:str, body:Textfile)-> str:
+    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    if(os.path.exists(targetFile)):
+        with open(targetFile, 'a', encoding='utf-8') as f:
+            f.write("\n" + body.content)
+        return ("Added to "+ filename + " successfully!")
+    else:
+        raise HTTPException(status_code=404, detail="Item not found")
 
 #Delete specified file
-@app.delete("/{filename}")
-async def helloRemover(filename:str):
-    removerTarget:str =  "./static/"+filename+".json" #request params
-    if(os.path.exists(removerTarget)):
-        os.remove(removerTarget) #removed the file if it still
-        return "deleted"
+@statRoute.delete("/{filename}")
+async def helloRemover(filename:str)-> str:
+    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    if(os.path.exists(targetFile)):
+        os.remove(targetFile) #removed the file if it still
+        return str(filename +" was successfully deleted!")
     else:
-        return 0
+        raise HTTPException(status_code=404, detail="Item not found")
 
-
-#Programatically run uvicorn:
-#if (__name__ == "__main__"):
-#    uvicorn.run("main:app", host="localhost", port=int(os.environ.get('PORT', 8000)), log_level="info", reload=True)
-#Gotta check out how to set up port and IP manually later

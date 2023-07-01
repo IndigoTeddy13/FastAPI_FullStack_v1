@@ -4,3 +4,6 @@ from pydantic import BaseModel, EmailStr #Models used in personal model definiti
 class EmailCheck(BaseModel):
     email:EmailStr
     verify:bool=False
+
+class Textfile(BaseModel):
+    content:str

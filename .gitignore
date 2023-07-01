@@ -1,14 +1,16 @@
-#VS Code config
+# VS Code config
 .vscode
-
-#FUTURE PORTIONS:
-
-
-
-#PYTHON3 PORTION:
-
+#Static folder:
+app/static
 #Generated DB
 data
+
+# Frontend PORTION:
+
+
+
+# Backend PORTION:
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
