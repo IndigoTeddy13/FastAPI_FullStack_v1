@@ -3,11 +3,11 @@ version: '3.8'
 services:
 #FastAPI server
   api:
-    build: .
+    build: ./fastapi
     container_name: fastapi
     command: uvicorn app.main:app --host 0.0.0.0 --reload
     volumes:
-      - ./app:/code/app
+      - ./fastapi/app:/code/app
     ports:
       - "8080:8000"
     depends_on:
@@ -21,9 +21,9 @@ services:
     volumes:
       - ./data:/data/db
 #NGINX client
-# client:
-#   image: nginx
-#   ports:
-#     - 80:80
-#   volumes:
-#     - ./front:/usr/share/nginx/html
+  client:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./front:/usr/share/nginx/html
