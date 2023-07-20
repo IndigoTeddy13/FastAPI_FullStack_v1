@@ -7,6 +7,7 @@ async function fetcher(url, method, body){
         credentials:"same-origin",
         headers: {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin":"http://localhost:8000/"
         },
         redirect:"follow",
         body:JSON.stringify(body)
@@ -16,7 +17,7 @@ async function fetcher(url, method, body){
 
 
 btn.onclick = async ()=>{
-    let results = await fetcher("http://localhost:80/", "GET", /*{
+    let results = await fetcher("http://localhost:8000/", "GET", /*{
         "myname":"Jotaro Kujo",
         "standname": "Star Platinum"
     }*/);

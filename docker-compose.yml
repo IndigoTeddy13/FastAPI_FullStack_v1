@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+#FastAPI server
   api:
     build: .
     container_name: fastapi
@@ -8,12 +9,10 @@ services:
     volumes:
       - ./app:/code/app
     ports:
-      - "80:8000"
+      - "8080:8000"
     depends_on:
       - db
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.fastapi.rule=Host(`fastapi.localhost`)"
+#MongoDB Database
   db:
     image: mongodb/mongodb-community-server
     container_name: mongodb
@@ -21,12 +20,10 @@ services:
       - "27018:27017"
     volumes:
       - ./data:/data/db
-#  traefik:
-#    image: traefik:v2.10
-#    container_name: traefik
-#    ports:
-#      - 80:80
-#      - 9999:8080
-#    volumes:
-#      - "./traefik.dev.toml:/etc/traefik/traefik.toml"
-#      - //var/run/docker.sock://var/run/docker.sock
+#NGINX client
+# client:
+#   image: nginx
+#   ports:
+#     - 80:80
+#   volumes:
+#     - ./front:/usr/share/nginx/html
