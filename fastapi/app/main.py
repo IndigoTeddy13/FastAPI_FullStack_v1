@@ -12,7 +12,7 @@ from .pydModels import *
 #CORS PERMS:
 #Allow at least these origins
 origins:list = [
-    "http://localhost:80",
+    "http://localhost", # implicit port 80
     "http://localhost:3000",
     "http://localhost:8000",
     "http://localhost:8080"

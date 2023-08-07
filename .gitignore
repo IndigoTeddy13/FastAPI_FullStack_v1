@@ -1,5 +1,6 @@
 # VS Code config
 .vscode
 .venv
+.env
 #Generated DB
 data

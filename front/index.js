@@ -4,10 +4,9 @@ async function fetcher(url, method, body){
     let response = await fetch(url,{
         method:method,
         mode:"cors",
-        credentials:"same-origin",
+        credentials:"include",
         headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin":"http://localhost:8000/"
+            "Content-Type": "application/json"
         },
         redirect:"follow",
         body:JSON.stringify(body)
@@ -17,10 +16,8 @@ async function fetcher(url, method, body){
 
 
 btn.onclick = async ()=>{
-    let results = await fetcher("http://localhost:8000/", "GET", /*{
-        "myname":"Jotaro Kujo",
-        "standname": "Star Platinum"
-    }*/);
+    let response = await fetch("http://localhost:8080/");
+    let results = await response.json();
     console.log(results);
     alert(JSON.stringify(results));
 }

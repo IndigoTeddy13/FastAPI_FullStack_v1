@@ -5,6 +5,8 @@ services:
   api:
     build: ./fastapi
     container_name: fastapi
+    env_file:
+      - ./.env
     command: uvicorn app.main:app --host 0.0.0.0 --reload
     volumes:
       - ./fastapi/app:/code/app
@@ -16,6 +18,12 @@ services:
   db:
     image: mongodb/mongodb-community-server
     container_name: mongodb
+    env_file:
+      - ./.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - "27018:27017"
     volumes:
@@ -27,3 +35,6 @@ services:
       - 80:80
     volumes:
       - ./front:/usr/share/nginx/html
+    depends_on:
+      - db
+      - api
