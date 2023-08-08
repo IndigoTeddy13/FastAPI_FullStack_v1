@@ -2,17 +2,26 @@
 import os #filepaths
 from fastapi import FastAPI, HTTPException #FastAPI stuff
 from fastapi.responses import FileResponse # send text files to users
+from pathvalidate import is_valid_filename # to validate an inputted filename
 #Personal imports
 from .pydModels import *
 
 #Static text file route:
 statRoute = FastAPI()
 
+#Function to check if a filename is valid
+def validateFilename(fName:str):
+    if(is_valid_filename(filename=str(fName+".txt"))):
+        return None
+    else:
+        raise HTTPException(status_code=400, detail="Not a valid name")
+
 #Static CRUD check
 
 #Request a specific greeting
 @statRoute.get("/{filename}")#greet person by name and return their request body
 async def helloGetter(filename:str)-> FileResponse:
+    validateFilename(filename) #validate filename before proceeding
     targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         return FileResponse(targetFile) #return file to user
@@ -22,6 +31,7 @@ async def helloGetter(filename:str)-> FileResponse:
 #Post new file if name is unused
 @statRoute.post("/{filename}")
 async def helloPoster(filename:str, body:Textfile)-> str:
+    validateFilename(filename) #validate filename before proceeding
     targetFile:str = filename+".txt" #request params
     targetPath:str = os.path.join(os.getcwd(), "app", "static")
     if (not(os.path.exists(targetPath))):
@@ -37,6 +47,7 @@ async def helloPoster(filename:str, body:Textfile)-> str:
 #Overwrite specified file
 @statRoute.put("/{filename}")
 async def helloPutter(filename:str, body:Textfile)-> str:
+    validateFilename(filename) #validate filename before proceeding
     targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         with open(targetFile, 'w', encoding='utf-8') as f:
@@ -48,6 +59,7 @@ async def helloPutter(filename:str, body:Textfile)-> str:
 #Add to specified file
 @statRoute.patch("/{filename}")
 async def helloPatcher(filename:str, body:Textfile)-> str:
+    validateFilename(filename) #validate filename before proceeding
     targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         with open(targetFile, 'a', encoding='utf-8') as f:
@@ -59,6 +71,7 @@ async def helloPatcher(filename:str, body:Textfile)-> str:
 #Delete specified file
 @statRoute.delete("/{filename}")
 async def helloRemover(filename:str)-> str:
+    validateFilename(filename) #validate filename before proceeding
     targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         os.remove(targetFile) #removed the file if it still
