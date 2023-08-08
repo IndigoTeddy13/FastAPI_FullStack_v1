@@ -55,7 +55,7 @@ async def emailValidator(check:EmailCheck)-> str:
         normalizedEmail:str = emailinfo.normalized
         return normalizedEmail
     except EmailNotValidError as e:
-        return(str(e))
+        raise HTTPException(status_code=400, detail=(str(e)))
 
 
 
