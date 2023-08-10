@@ -17,6 +17,10 @@ docker-compose build
 ```bash
 docker-compose up -d
 ```
+Alternatively:
+```bash
+docker-compose up --build -d
+```
 To turn the container off:
 ```bash
 docker-compose down
