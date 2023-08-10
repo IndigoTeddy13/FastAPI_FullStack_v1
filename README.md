@@ -1,5 +1,5 @@
 # TestingFastAPIv1
-My first attempt at building a fullstack app for FastAPI.
+My first attMy first fullstack app with FastAPI as a backend. Two frontends (NGINX for HTML/CSS/JS, and Svelte). MongoDB as a database. Dockerized. empt at building a fullstack app for FastAPI.
 
 ## Tech Stack
 * Backend: FastAPI
