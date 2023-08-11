@@ -16,7 +16,7 @@ async function fetcher(url, method, body){
 
 
 btn.onclick = async ()=>{
-    let response = await fetch("http://localhost:8080/");
+    let response = await fetch("/api/");//proxy to /api/
     let results = await response.json();
     console.log(results);
     alert(JSON.stringify(results));
