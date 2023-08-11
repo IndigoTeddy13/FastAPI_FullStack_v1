@@ -11,13 +11,15 @@ My first fullstack app with FastAPI as a backend. Two frontends (NGINX for HTML/
 
 ## Dockerization
 To run as a docker container, open the main project directory and run the following commands, then go to http://localhost to visit the service. Entering http://localhost:3000 will load the Svelte frontend app instead of the NGINX frontend app.
-Windows:
 ```bash
-bash run.sh
+docker-compose build
 ```
-Linux:
 ```bash
-./run.sh
+docker-compose up -d
+```
+Alternatively:
+```bash
+docker-compose up --build -d
 ```
 To turn the container off:
 ```bash
