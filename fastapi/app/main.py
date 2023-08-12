@@ -4,9 +4,9 @@ from typing import Any, Dict, List, Union #different types
 from email_validator import validate_email, EmailNotValidError #email validation
 from fastapi import FastAPI, HTTPException #FastAPI stuff
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
-from fastapi.responses import FileResponse # send text files to users
 #Personal imports
 from .statRoute import *
+from .mongoRoute import *
 from .pydModels import *
 
 #CORS PERMS:
@@ -38,7 +38,6 @@ app.add_middleware(
 app.mount("/static", statRoute)
 
 #MongoDB management router
-mongoRoute = FastAPI()
 app.mount("/db", mongoRoute)
 
 #API calls
