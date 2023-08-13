@@ -8,6 +8,7 @@ from .pydModels import *
 
 #Static text file route:
 statRoute = APIRouter()
+staticDir:str = os.path.join(os.getcwd(), "app", "static")
 
 #Function to check if a filename is valid
 def validateFilename(fName:str):
@@ -17,12 +18,25 @@ def validateFilename(fName:str):
         raise HTTPException(status_code=400, detail="Not a valid name")
 
 #Static CRUD check
+@statRoute.get("/")
+async def allHellos() ->list:
+    if (not(os.path.exists(staticDir))):
+        os.makedirs(staticDir)#make directory if it doesn't exist
+
+    # Now check for the contents of staticDir
+    helloList:list = os.listdir(staticDir)
+    if(len(helloList)==0):
+        raise HTTPException(status_code=404, detail="No greetings available at the moment")
+    else:
+        return [s.strip(".txt") for s in helloList] # strip out the .txt suffixes
 
 #Request a specific greeting
 @statRoute.get("/{filename}")#greet person by name and return their request body
 async def helloGetter(filename:str)-> FileResponse:
     validateFilename(filename) #validate filename before proceeding
-    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    targetFile:str = staticDir +"/"+ filename+".txt" #request params
+    if (not(os.path.exists(staticDir))):
+        os.makedirs(staticDir)#make directory if it doesn't exist
     if(os.path.exists(targetFile)):
         return FileResponse(targetFile) #return file to user
     else:
@@ -33,10 +47,10 @@ async def helloGetter(filename:str)-> FileResponse:
 async def helloPoster(filename:str, body:Textfile)-> str:
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = filename+".txt" #request params
-    targetPath:str = os.path.join(os.getcwd(), "app", "static")
-    if (not(os.path.exists(targetPath))):
-        os.makedirs(targetPath)#make directory if it doesn't exist
-    newPath:str = targetPath+"/"+targetFile
+    if (not(os.path.exists(staticDir))):
+        os.makedirs(staticDir)#make directory if it doesn't exist
+    
+    newPath:str = staticDir+"/"+targetFile
     if(not(os.path.exists(newPath))):
         with open(newPath, 'w', encoding='utf-8') as f:
             f.write(body.content)
@@ -48,7 +62,7 @@ async def helloPoster(filename:str, body:Textfile)-> str:
 @statRoute.put("/{filename}")
 async def helloPutter(filename:str, body:Textfile)-> str:
     validateFilename(filename) #validate filename before proceeding
-    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         with open(targetFile, 'w', encoding='utf-8') as f:
             f.write(body.content)
@@ -60,7 +74,7 @@ async def helloPutter(filename:str, body:Textfile)-> str:
 @statRoute.patch("/{filename}")
 async def helloPatcher(filename:str, body:Textfile)-> str:
     validateFilename(filename) #validate filename before proceeding
-    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         with open(targetFile, 'a', encoding='utf-8') as f:
             f.write("\n" + body.content)
@@ -72,7 +86,7 @@ async def helloPatcher(filename:str, body:Textfile)-> str:
 @statRoute.delete("/{filename}")
 async def helloRemover(filename:str)-> str:
     validateFilename(filename) #validate filename before proceeding
-    targetFile:str = os.path.join(os.getcwd(), "app", "static") +"/"+ filename+".txt" #request params
+    targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
         os.remove(targetFile) #removed the file if it still
         return str(filename +" was successfully deleted!")
