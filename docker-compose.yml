@@ -4,7 +4,7 @@ services:
 #FastAPI server
   api:
     build: ./fastapi
-    container_name: fastapi
+    container_name: api
     env_file:
       - ./.env
     command: uvicorn app.main:app --host 0.0.0.0 --reload
@@ -29,12 +29,13 @@ services:
     volumes:
       - ./data:/data/db
 #NGINX client
-  client:
+  nginx:
     image: nginx
+    container_name: nginx
     ports:
       - 80:80
     volumes:
       - ./front:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - api
