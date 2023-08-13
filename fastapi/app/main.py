@@ -2,7 +2,7 @@
 import os, json #filepaths, JSONs
 from typing import Any, Dict, List, Union #different types
 from email_validator import validate_email, EmailNotValidError #email validation
-from fastapi import FastAPI, HTTPException #FastAPI stuff
+from fastapi import FastAPI, APIRouter, HTTPException #FastAPI stuff
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
 #Personal imports
 from .statRoute import *
@@ -35,10 +35,10 @@ app.add_middleware(
 )
 
 #Static file management router
-app.mount("/static", statRoute)
+app.include_router(statRoute, prefix="/static")
 
 #MongoDB management router
-app.mount("/db", mongoRoute)
+app.include_router(mongoRoute, prefix="/db")
 
 #API calls
 

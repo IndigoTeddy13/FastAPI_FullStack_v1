@@ -1,13 +1,13 @@
 #Imports
 import os #filepaths
-from fastapi import FastAPI, HTTPException #FastAPI stuff
+from fastapi import FastAPI, APIRouter, HTTPException #FastAPI stuff
 from fastapi.responses import FileResponse # send text files to users
 from pathvalidate import is_valid_filename # to validate an inputted filename
 #Personal imports
 from .pydModels import *
 
 #Static text file route:
-statRoute = FastAPI()
+statRoute = APIRouter()
 
 #Function to check if a filename is valid
 def validateFilename(fName:str):
