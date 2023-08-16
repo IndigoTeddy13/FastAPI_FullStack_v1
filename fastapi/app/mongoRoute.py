@@ -1,5 +1,5 @@
-import os, json #filepaths, JSONs
-from motor import motor_asyncio #async connections to MongoDB
+import os, json, asyncio #filepaths, JSONs, async requests
+from motor.motor_asyncio import AsyncIOMotorClient #async connections to MongoDB
 from fastapi import FastAPI, APIRouter, HTTPException #FastAPI stuff
 
 # MongoDB management route:

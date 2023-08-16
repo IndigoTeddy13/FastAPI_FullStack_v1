@@ -1,12 +1,14 @@
 # TestingFastAPIv1
-My first fullstack app with FastAPI as a backend. Two frontends (NGINX for HTML/CSS/JS, and Svelte). MongoDB as a database. Dockerized.
+My first fullstack app with FastAPI as a backend. Two frontends (NGINX for HTML/CSS/JS, and a JS frontend framework). MongoDB as a database. Dockerized.
+
+Currently WIP.
 
 ## Tech Stack
-* Backend: FastAPI
-* Frontend 1: NGINX (serve HTML, CSS, and JS)
+* Backend: FastAPI (an asynchronous REST framework for Python running on Uvicorn)
+* Frontend 1: NGINX (serves prebuilt HTML, CSS, and JS)
 * Frontend 2: Svelte (or maybe React, not sure yet)
 * Database: MongoDB
-* Reverse-Proxy (might remove this if I don't need it): Traefik
+* Reverse-Proxy via NGINX
 * Runtime Environment: Docker
 
 ## Dockerization
