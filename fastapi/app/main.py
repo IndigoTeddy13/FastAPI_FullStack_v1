@@ -6,7 +6,7 @@ from fastapi import FastAPI, APIRouter, HTTPException #FastAPI stuff
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
 #Personal imports
 from .statRoute import *
-from .mongoRoute import *
+from .signinRoute import *
 from .pydModels import *
 
 #CORS PERMS:
@@ -38,7 +38,7 @@ app.add_middleware(
 app.include_router(statRoute, prefix="/static")
 
 #MongoDB management router
-app.include_router(mongoRoute, prefix="/db")
+app.include_router(signinRoute, prefix="/signin")
 
 #API calls
 
