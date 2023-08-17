@@ -1,5 +1,6 @@
 from typing import Optional #Optional type for certain values
-from pydantic import BaseModel, EmailStr #Models used in personal model definitions
+from pydantic import BaseModel, EmailStr, Field #Models used in personal model definitions
+from uuid import UUID, uuid4
 
 class EmailCheck(BaseModel):
     email:EmailStr
@@ -10,17 +11,19 @@ class Textfile(BaseModel):
 
 #Login classes
 class User(BaseModel):
-    username: str
-    company: str
-    password: str
+    id: UUID = Field(default_factory=uuid4)
+    email:EmailStr
+    password:str
+    displayName:str
+    activated:bool=False
 
 class Login(BaseModel):
-    username: str
-    password: str
+    email:str
+    password:str
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    access_token:str
+    token_type:str
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    username:Optional[str]=None

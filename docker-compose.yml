@@ -13,21 +13,29 @@ services:
     ports:
       - "8080:8000"
     depends_on:
-      - db
+      - mongodb
+      - mariadb
 #MongoDB Database
-  db:
+  mongodb:
     image: mongodb/mongodb-community-server
     container_name: mongodb
-    env_file:
-      - ./.env
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - "27018:27017"
     volumes:
-      - ./data:/data/db
+      - ./data/mongo:/data/db
+#SQL Database
+  mariadb:
+    image: mariadb:11.0.3
+    container_name: mariadb
+    env_file:
+      - ./.env
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
 #NGINX client
   nginx:
     image: nginx

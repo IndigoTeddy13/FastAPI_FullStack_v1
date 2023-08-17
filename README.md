@@ -7,7 +7,7 @@ Currently WIP.
 * Backend: FastAPI (an asynchronous REST framework for Python running on Uvicorn)
 * Frontend 1: NGINX (serves prebuilt HTML, CSS, and JS)
 * Frontend 2: Svelte (or maybe React, not sure yet)
-* Database: MongoDB
+* Database: MongoDB (Might ditch for MariaDB if I can't figure it out though)
 * Reverse-Proxy via NGINX
 * Runtime Environment: Docker
 
