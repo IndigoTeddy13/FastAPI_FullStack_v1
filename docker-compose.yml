@@ -19,6 +19,12 @@ services:
   mongodb:
     image: mongodb/mongodb-community-server
     container_name: mongodb
+    env_file:
+      - ./.env
+    environment:
+      MONGODB_INITDB_DATABASE: ${MONGODB_INITDB_DATABASE}
+      MONGODB_INITDB_ROOT_USERNAME: ${MONGODB_INITDB_ROOT_USERNAME}
+      MONGODB_INITDB_ROOT_PASSWORD: ${MONGODB_INITDB_ROOT_PASSWORD}
     ports:
       - "27018:27017"
     volumes:
