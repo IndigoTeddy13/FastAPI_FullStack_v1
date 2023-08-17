@@ -19,6 +19,7 @@ services:
   mongodb:
     image: mongodb/mongodb-community-server
     container_name: mongodb
+    restart: unless-stopped
     env_file:
       - ./.env
     environment:
@@ -33,6 +34,7 @@ services:
   mariadb:
     image: mariadb:11.0.3
     container_name: mariadb
+    restart: unless-stopped
     env_file:
       - ./.env
     environment:
