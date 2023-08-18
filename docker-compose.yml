@@ -14,7 +14,7 @@ services:
       - "8080:8000"
     depends_on:
       - dbmongo
-      - dbmaria
+      # - dbmaria
 #MongoDB Database
   dbmongo:
     image: mongodb/mongodb-community-server
@@ -31,20 +31,20 @@ services:
       - "27018:27017"
     volumes:
       - ./data/mongo:/data/db
-#SQL Database
-  dbmaria:
-    image: mariadb:11.0.3
-    container_name: dbmaria
-    restart: unless-stopped
-    env_file:
-      - ./.env
-    environment:
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-    ports:
-      - "3308:3306"
-    volumes:
-      - ./data/mariadb:/var/lib/mysql
+# #SQL Database
+#   dbmaria:
+#     image: mariadb:11.0.3
+#     container_name: dbmaria
+#     restart: unless-stopped
+#     env_file:
+#       - ./.env
+#     environment:
+#       MARIADB_DATABASE: ${MARIADB_DATABASE}
+#       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+#     ports:
+#       - "3308:3306"
+#     volumes:
+#       - ./data/mariadb:/var/lib/mysql
 #NGINX client
   nginx:
     image: nginx
