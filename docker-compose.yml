@@ -13,12 +13,12 @@ services:
     ports:
       - "8080:8000"
     depends_on:
-      - mongodb
-      - mariadb
+      - dbmongo
+      - dbmaria
 #MongoDB Database
-  mongodb:
+  dbmongo:
     image: mongodb/mongodb-community-server
-    container_name: mongodb
+    container_name: dbmongo
     restart: unless-stopped
     env_file:
       - ./.env
@@ -26,14 +26,15 @@ services:
       MONGODB_INITDB_DATABASE: ${MONGODB_INITDB_DATABASE}
       MONGODB_INITDB_ROOT_USERNAME: ${MONGODB_INITDB_ROOT_USERNAME}
       MONGODB_INITDB_ROOT_PASSWORD: ${MONGODB_INITDB_ROOT_PASSWORD}
+    command: ["--bind_ip_all"]
     ports:
       - "27018:27017"
     volumes:
       - ./data/mongo:/data/db
 #SQL Database
-  mariadb:
+  dbmaria:
     image: mariadb:11.0.3
-    container_name: mariadb
+    container_name: dbmaria
     restart: unless-stopped
     env_file:
       - ./.env
