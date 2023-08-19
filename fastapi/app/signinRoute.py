@@ -6,6 +6,4 @@ signinRoute = APIRouter()
 
 @signinRoute.get("/")
 async def signinHome()->dict:
-    return {
-        "mongo":await testMongo()
-    }
+    return await testMongo()
