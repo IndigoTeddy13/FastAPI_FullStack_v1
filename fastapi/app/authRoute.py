@@ -33,6 +33,6 @@ async def getProfile():
 async def changePassword():
     return "password changed"
 
-@authRoute.post("/logout")
+@authRoute.delete("/logout")
 async def logout():
     return "logged out"
