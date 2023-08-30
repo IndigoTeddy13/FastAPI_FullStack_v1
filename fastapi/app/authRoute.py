@@ -1,12 +1,16 @@
 import os, json, asyncio #filepaths, JSONs, async requests
 from fastapi import APIRouter, HTTPException, Request #FastAPI stuff
-from .dbDriver import testMongo
+from .drivers.mongo import testMongo
+from .drivers.redis import testRedis
 # MongoDB management route:
 authRoute = APIRouter()
 
 @authRoute.get("/")
 async def authHome()->dict:
-    return await testMongo()
+    return {
+        "mongo_healthCheck":await testMongo(),
+        "redis_healthCheck":await testRedis()
+    }
 
 @authRoute.get("/refresh-token")
 async def refreshToken(request:Request):
