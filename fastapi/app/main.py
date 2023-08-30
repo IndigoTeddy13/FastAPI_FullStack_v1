@@ -18,21 +18,16 @@ origins:list = [
     "http://localhost:8000",
     "http://localhost:8080"
 ]
-#Allow all kinds of methods
-methods:list = [
-    "GET", "POST", "PULL", "DELETE",
-    "PATCH", "HEAD", "OPTIONS",
-    "CONNECT", "TRACE"
-] 
+
 #Server Initialization
 app = FastAPI() #initialize FastAPI
 #Use CORSMiddleware to ensure CORS is permitted on this server
 app.add_middleware(
     CORSMiddleware,  
-    allow_origins=origins,
-    allow_credentials=True, 
-    allow_methods=methods,
-    allow_headers=["*"]#Not sure what headers to block, so allow all for now
+    allow_origins=origins,# Allow all methods and headers, restrict origins
+    allow_credentials=True, # True to allow cookies to be sent over
+    allow_methods=["*"], 
+    allow_headers=["*"]
 )
 
 #Static file management router
