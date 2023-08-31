@@ -80,9 +80,9 @@ async def set_session(request:Request):
 
 @app.get("/get")
 async def get_session(request:Request):
-    return request.session # or session.get("key")
+    return request.session
 
 @app.get("/clear")
 async def clear_session(request:Request):
     request.session.clear()
-    return "Cleared session!" # or session.get("key")
+    return "Cleared session!"
