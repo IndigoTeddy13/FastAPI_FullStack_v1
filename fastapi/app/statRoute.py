@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse # send text files to users
 from pathvalidate import is_valid_filename # to validate an inputted filename
 #Personal imports
 from .pydModels import *
+from .drivers.mongo import *
 
 #Static text file route:
 statRoute = APIRouter()

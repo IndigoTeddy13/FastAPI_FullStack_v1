@@ -9,8 +9,3 @@ redisURL:str = redisTemp.format(
     port=str(os.getenv("REDIS_PORT")),
     db_number=0 #Start with DB0 for now
 )
-#Connect to Redis container
-
-#Test function
-async def testRedis():
-    return {"redisURL":redisURL}

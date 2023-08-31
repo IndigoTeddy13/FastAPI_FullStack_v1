@@ -17,7 +17,7 @@ services:
       - dbredis
 #MongoDB Database
   dbmongo:
-    image: mongodb/mongodb-community-server:latest
+    image: mongodb/mongodb-community-server
     container_name: dbmongo
     restart: unless-stopped
     environment:
@@ -31,7 +31,7 @@ services:
       - ./data/mongo:/data/db
 #Redis Database/Cache/Sessions
   dbredis:
-    image: redis:latest
+    image: redis/redis-stack-server
     container_name: dbredis
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD}
