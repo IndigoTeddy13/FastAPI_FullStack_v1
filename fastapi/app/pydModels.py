@@ -1,22 +1,30 @@
 from typing import Optional #Optional type for certain values
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field #Models used in personal model definitions
 from uuid import UUID, uuid4
-
-class EmailCheck(BaseModel):
-    email:EmailStr
-    verify:bool=False
 
 class Textfile(BaseModel):
     content:str
 
-#Login classes
-class User(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
+#Account classes
+class RegUser(BaseModel):
     email:EmailStr
     password:str
+    passConf:str
     displayName:str
-    activated:bool=False
+    activationCode:str
 
-class Login(BaseModel):
-    email:str
+class UserEntry(BaseModel):
+    email:EmailStr
+    hash:str
+    displayName:str
+    created:datetime = datetime.utcnow()
+    admin:bool=False
+
+class LoginUser(BaseModel):
+    email:EmailStr
     password:str
+
+class ChangeUserPass(BaseModel):
+    newPass:str
+    newPassConf:str

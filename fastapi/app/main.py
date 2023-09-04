@@ -1,7 +1,6 @@
 #Imports
 import os, json #filepaths, JSONs
 #from typing import Any, Dict, List, Union #different types
-from email_validator import validate_email, EmailNotValidError #email validation
 from fastapi import Depends, FastAPI, HTTPException #FastAPI stuff
 from fastapi.responses import JSONResponse
 from starlette.middleware import Middleware
@@ -62,27 +61,3 @@ app.include_router(authRoute, prefix="/auth")
 @app.get("/")
 async def helloWorld()-> dict:
     return {"Hello":"World"}
-#Email validation
-@app.post("/validate")
-async def emailValidator(check:EmailCheck)-> str:
-    try:
-        emailinfo:object = validate_email(check.email, check_deliverability=check.verify)
-        normalizedEmail:str = emailinfo.normalized
-        return normalizedEmail
-    except EmailNotValidError as e:
-        raise HTTPException(status_code=400, detail=(str(e)))
-
-#Server session tests:
-@app.get("/set")
-async def set_session(request:Request):
-    request.session["key"] = "value"
-    return "Key stored!"
-
-@app.get("/get")
-async def get_session(request:Request):
-    return request.session
-
-@app.get("/clear")
-async def clear_session(request:Request):
-    request.session.clear()
-    return "Cleared session!"
