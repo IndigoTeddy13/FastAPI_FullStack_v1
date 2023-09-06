@@ -1,6 +1,5 @@
-import os, json, asyncio #filepaths, JSONs, async requests
+import os, json, asyncio, uuid #filepaths, JSONs, async requests
 from fastapi import APIRouter, HTTPException, Request #FastAPI stuff
-from email_validator import validate_email, EmailNotValidError
 from fastapi.responses import RedirectResponse #email validation
 from passlib.context import CryptContext
 #Personal imports
@@ -23,12 +22,12 @@ authRoute = APIRouter()
 async def authHome()->dict:
     return await testMongo()
 
-@authRoute.put("/refresh-token")# Most likely called on page load and after login on frontend
+@authRoute.post("/refresh-token")# Most likely called on page load and after login on frontend
 async def refreshToken(request:Request):
     #Check if a session is active
     if(request.session):
         #Store new access token for comparison (invalidates old tokens)
-        request.session["active-token"] = "refreshed jwt"
+        request.session["token"] = "refreshed jwt"
         return request.session["active-token"] #return new access token
     else:
         raise HTTPException(status_code=401, detail="Login expired. Log in again.")
@@ -36,19 +35,9 @@ async def refreshToken(request:Request):
 
 @authRoute.post("/register")
 async def register(user:RegUser):
-    #check email string is valid
-    normalizedEmail:EmailStr
-    try:
-        emailinfo:object = validate_email(
-            email=user.email,
-            check_deliverability=True
-        )
-        normalizedEmail = EmailStr(emailinfo.normalized)
-    except EmailNotValidError as e:
-        raise HTTPException(status_code=400, detail=(str(e)))
     #add to main DB
     newUser:UserEntry = UserEntry(
-        email=normalizedEmail,
+        email=user.email,
         hash=hashPassword(user.password),
         displayName=user.displayName
     )
