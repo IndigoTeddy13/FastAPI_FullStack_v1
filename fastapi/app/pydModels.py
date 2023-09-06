@@ -12,7 +12,8 @@ class RegUser(BaseModel):
     password:str = Field(..., min_length=3, max_length=50) # 3 to 50 characters long
     passConf:str = Field(..., min_length=3, max_length=50)
     displayName:str = Field(..., min_length=1, max_length=30) # 1 to 30 characters long
-
+    activationCode:int
+    
     @field_validator("passConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:
         if "password" in info.data and v != info.data["password"]:
@@ -24,7 +25,6 @@ class UserEntry(BaseModel):
     hash:str # store hash of password here
     displayName:str = Field(..., min_length=1, max_length=30)
     created:datetime = datetime.utcnow()
-    activated:bool=False #default unactivated
     admin:bool=False #default not an admin
 
 class LoginUser(BaseModel):
@@ -34,7 +34,7 @@ class LoginUser(BaseModel):
 class ChangeUserPass(BaseModel): # currently only allow changing password of logged-in user
     newPass:str = Field(..., min_length=3, max_length=50)
     newPassConf:str = Field(..., min_length=3, max_length=50)
-    
+
     @field_validator("newPassConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:
         if "newPass" in info.data and v != info.data["newPass"]:

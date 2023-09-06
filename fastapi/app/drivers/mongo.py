@@ -1,6 +1,9 @@
 import os, pprint #environment, Cursor-to-Dictionary
 from motor.motor_asyncio import AsyncIOMotorClient #async connections to MongoDB
 
+#Store FastAPI_DB for future use
+FastAPI_DB:str = str(os.getenv("MONGODB_INITDB_DATABASE"))
+
 #MongoDB setup
 #Format URL:
 mongoTemp:str = "mongodb://{user}:{password}@{domain}:{port}/{dbname}?authSource={user}"
@@ -9,7 +12,7 @@ mongoURL:str = mongoTemp.format(
     password=str(os.getenv("MONGODB_INITDB_ROOT_PASSWORD")),
     domain=str(os.getenv("MONGO_DOMAIN")),
     port=str(os.getenv("MONGO_PORT")),
-    dbname=str(os.getenv("MONGODB_INITDB_DATABASE"))
+    dbname=FastAPI_DB
 )
 #Connect to MongoDB container:
 mongoClient = AsyncIOMotorClient(mongoURL)
@@ -21,19 +24,8 @@ async def queryToDict(c): # Input the query
 
 #Test function
 async def testMongo():
-    databases:list = await mongoClient.list_database_names() # list DBs
-    selectedDB:str = databases[0]
-    enteredDB = mongoClient[selectedDB] # Entered DB indexed 0
-    collectionsInDB:list = await enteredDB.list_collection_names() # List collections in DB
-    selectedCollection:str = collectionsInDB[0]
-    enteredCollection= enteredDB[selectedCollection] #Entered collection indexed 0
-    documentsCount:int = await enteredCollection.count_documents({})
-    documentsInCollection = await queryToDict(enteredCollection.find({}))
-    return{
-        "databases":databases,
-        "selectedDB":selectedDB,
-        "collectionsInDB":collectionsInDB,
-        "selectedCollection":selectedCollection,
-        "documentsCount":documentsCount,
-        "documentsInCollection":documentsInCollection
-    }
+    try:
+        await mongoClient["admin"].command('ping')
+        print("Pinged your deployment. You have successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
