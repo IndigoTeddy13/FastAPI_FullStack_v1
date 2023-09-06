@@ -26,6 +26,6 @@ async def queryToDict(c): # Input the query
 async def testMongo():
     try:
         await mongoClient["admin"].command('ping')
-        print("Pinged your deployment. You have successfully connected to MongoDB!")
+        return ("Pinged your deployment. You have successfully connected to MongoDB!")
     except Exception as e:
-        print(e)
+        return(e)

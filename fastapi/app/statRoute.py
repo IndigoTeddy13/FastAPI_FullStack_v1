@@ -1,6 +1,6 @@
 #Imports
 import os #filepaths
-from fastapi import APIRouter, HTTPException #FastAPI stuff
+from fastapi import APIRouter, HTTPException, Request #FastAPI stuff
 from fastapi.responses import FileResponse # send text files to users
 from pathvalidate import is_valid_filename # to validate an inputted filename
 #Personal imports
@@ -45,7 +45,11 @@ async def helloGetter(filename:str)-> FileResponse:
 
 #Post new file if name is unused
 @statRoute.post("/{filename}")
-async def helloPoster(filename:str, body:Textfile)-> str:
+async def helloPoster(filename:str, body:Textfile, request:Request)-> str:
+    #Ensure the user is logged in first
+    if not(request.session and request.session.get("user")):
+        raise HTTPException(status_code=403, detail="Must log in to post a new greeting.")
+    #Write the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = filename+".txt" #request params
     if (not(os.path.exists(staticDir))):
@@ -61,7 +65,11 @@ async def helloPoster(filename:str, body:Textfile)-> str:
 
 #Overwrite specified file
 @statRoute.put("/{filename}")
-async def helloPutter(filename:str, body:Textfile)-> str:
+async def helloPutter(filename:str, body:Textfile, request:Request)-> str:
+    #Ensure the user is logged in first
+    if not(request.session and request.session.get("user")):
+        raise HTTPException(status_code=403, detail="Must log in to replace a greeting.")
+    #Replace the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
@@ -73,7 +81,11 @@ async def helloPutter(filename:str, body:Textfile)-> str:
 
 #Add to specified file
 @statRoute.patch("/{filename}")
-async def helloPatcher(filename:str, body:Textfile)-> str:
+async def helloPatcher(filename:str, body:Textfile, request:Request)-> str:
+    #Ensure the user is logged in first
+    if not(request.session and request.session.get("user")):
+        raise HTTPException(status_code=403, detail="Must log in to append to a greeting.")
+    #Append to the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
@@ -85,7 +97,11 @@ async def helloPatcher(filename:str, body:Textfile)-> str:
 
 #Delete specified file
 @statRoute.delete("/{filename}")
-async def helloRemover(filename:str)-> str:
+async def helloRemover(filename:str, request:Request)-> str:
+    #Ensure the user is logged in first
+    if not(request.session and request.session.get("user")):
+        raise HTTPException(status_code=403, detail="Must log in to remove a greeting.")
+    #Remove the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
     if(os.path.exists(targetFile)):
