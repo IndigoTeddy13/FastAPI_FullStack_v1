@@ -13,7 +13,7 @@ authRoute = APIRouter()
 async def authHome()->dict:
     return await testMongo()
 
-@authRoute.get("/refresh-token")# Most likely called on page load and after login on frontend
+@authRoute.put("/refresh-token")# Most likely called on page load and after login on frontend
 async def refreshToken(request:Request):
     #Check if a session is active
     if(request.session):
@@ -36,9 +36,6 @@ async def register(user:RegUser):
         normalizedEmail = EmailStr(emailinfo.normalized)
     except EmailNotValidError as e:
         raise HTTPException(status_code=400, detail=(str(e)))
-    #Confirm passwords match
-    if (not(user.password == user.passConf)):
-        raise HTTPException(status_code=400, detail="Passwords don't match")
     #add to main DB
     newUser:UserEntry = UserEntry(email=normalizedEmail, hash=user.password, displayName=user.displayName)
     #redirect user to login
@@ -71,9 +68,6 @@ async def changePassword(request:Request, user:ChangeUserPass):
     #Confirm user is logged in
     if not(request.session):
         raise HTTPException(status_code=400, detail="Log in with your account to try changing your password")
-    #Confirm passwords match
-    if (not(user.newPass == user.newPassConf)):
-        raise HTTPException(status_code=400, detail="Passwords don't match")
     #check against main DB for requested user
     #change password
     request.session["user"]["password"] = user.newPass
