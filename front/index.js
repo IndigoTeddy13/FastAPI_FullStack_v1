@@ -10,7 +10,7 @@ async function fetcher(url, method, body){
         credentials:"include",
         headers: {
             "Content-Type": "application/json",
-            "Authentication": `${auth_token}`//only used on protected routes
+            "Anti-CSRF": `${auth_token}`//only used on protected routes
         },
         redirect:"follow",
         body:JSON.stringify(body)

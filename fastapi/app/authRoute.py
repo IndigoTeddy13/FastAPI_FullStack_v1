@@ -39,6 +39,14 @@ def verifyPassword(plain_password, hashed_password):
 def hashPassword(password):
     return pwd_context.hash(password)
 
+#Check anti-CSRF token on authenticated routes
+async def checkToken(request:Request):
+    if not(request.session and request.session.get("user")):
+        raise HTTPException(status_code=403, detail="User isn't logged in properly. Log in and try again.")
+    if not(request.session.get("token")==request.headers.get("Anti-CSRF")):
+        raise HTTPException(status_code=403, detail="User didn't provide the correct Anti-CSRF token in header. Fetch a new token and try again.")
+    
+
 # Account management route:
 authRoute = APIRouter()
 
@@ -82,7 +90,7 @@ async def refreshToken(request:Request):
     if(request.session and request.session.get("user")):
         #Store new access token for comparison (invalidates old tokens)
         request.session["token"] = "refreshed jwt"
-        return request.session["token"] #return new access token
+        return {"token": request.session["token"]} #return new access token
     else:
         raise HTTPException(status_code=401, detail="Login expired. Log in again.")  
 
@@ -129,7 +137,7 @@ async def login(request:Request, user:LoginUser):
 
     #Start a new session
     request.session["user"] = possibleUser.email
-    return "logged in"
+    return await refreshToken(request=request)
 
 @authRoute.get("/profile")
 async def getProfile(request:Request):
