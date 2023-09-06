@@ -2,11 +2,21 @@ import os, json, asyncio #filepaths, JSONs, async requests
 from fastapi import APIRouter, HTTPException, Request #FastAPI stuff
 from email_validator import validate_email, EmailNotValidError
 from fastapi.responses import RedirectResponse #email validation
+from passlib.context import CryptContext
 #Personal imports
 from .drivers.mongo import *
 from .pydModels import *
 
-# MongoDB management route:
+#Password hashing functions
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verifyPassword(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def hashPassword(password):
+    return pwd_context.hash(password)
+
+# Account management route:
 authRoute = APIRouter()
 
 @authRoute.get("/")
@@ -37,7 +47,11 @@ async def register(user:RegUser):
     except EmailNotValidError as e:
         raise HTTPException(status_code=400, detail=(str(e)))
     #add to main DB
-    newUser:UserEntry = UserEntry(email=normalizedEmail, hash=user.password, displayName=user.displayName)
+    newUser:UserEntry = UserEntry(
+        email=normalizedEmail,
+        hash=hashPassword(user.password),
+        displayName=user.displayName
+    )
     #redirect user to login
     return newUser
 
