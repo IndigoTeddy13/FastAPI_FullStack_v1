@@ -32,11 +32,16 @@ class LoginUser(BaseModel):
     password:str = Field(..., min_length=3, max_length=50)
 
 class ChangeUserPass(BaseModel): # currently only allow changing password of logged-in user
+    email:Optional[EmailStr] # Either log in or provide email and activation code
     newPass:str = Field(..., min_length=3, max_length=50)
     newPassConf:str = Field(..., min_length=3, max_length=50)
+    activationCode:Optional[int]
 
     @field_validator("newPassConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:
         if "newPass" in info.data and v != info.data["newPass"]:
             raise ValueError("Passwords do not match")
         return v
+
+class ChangeUserName(BaseModel):
+    displayName:str = Field(..., min_length=1, max_length=30)
