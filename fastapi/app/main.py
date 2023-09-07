@@ -1,5 +1,4 @@
 #Imports
-import os, json #filepaths, JSONs
 #from typing import Any, Dict, List, Union #different types
 from fastapi import Depends, FastAPI, HTTPException #FastAPI stuff
 from fastapi.responses import JSONResponse
@@ -12,7 +11,7 @@ from .pydModels import *
 from .drivers.mongo import *
 from .drivers.redis import redisURL
 #Redis Session Storage configuration
-from starsessions import load_session, SessionMiddleware, SessionAutoloadMiddleware
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware
 from starsessions.stores.redis import RedisStore
 session_store = RedisStore(url=redisURL, gc_ttl=3600)
 

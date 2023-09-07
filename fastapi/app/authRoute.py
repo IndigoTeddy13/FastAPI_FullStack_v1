@@ -1,6 +1,5 @@
-import os, json, asyncio, uuid #filepaths, JSONs, async requests
+import os, uuid #filepaths, JSONs, async requests
 from fastapi import APIRouter, HTTPException, Request, Depends #FastAPI stuff
-from fastapi.responses import RedirectResponse #email validation
 from passlib.context import CryptContext
 #Mail handlers
 from email_validator import validate_email, EmailNotValidError

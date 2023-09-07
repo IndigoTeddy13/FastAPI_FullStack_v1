@@ -1,6 +1,6 @@
 from typing import Optional #Optional type for certain values
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, ValidationError, field_validator #Models used in personal model definitions
+from pydantic import BaseModel, EmailStr, Field, field_validator #Models used in personal model definitions
 from pydantic_core.core_schema import FieldValidationInfo
 
 class Textfile(BaseModel):
