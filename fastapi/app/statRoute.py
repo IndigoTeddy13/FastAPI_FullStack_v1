@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse # send text files to users
 from pathvalidate import is_valid_filename # to validate an inputted filename
 #Personal imports
 from .pydModels import *
-from .authRoute import checkToken
+from .authRoute import checkUser
 from .drivers.mongo import *
 
 #Static text file route:
@@ -48,7 +48,7 @@ async def helloGetter(filename:str)-> FileResponse:
 @statRoute.post("/{filename}")
 async def helloPoster(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
-    await checkToken(request=request)
+    await checkUser(request=request, needToken=True)
     #Write the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = filename+".txt" #request params
@@ -67,7 +67,7 @@ async def helloPoster(filename:str, body:Textfile, request:Request)-> str:
 @statRoute.put("/{filename}")
 async def helloPutter(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
-    await checkToken(request=request)
+    await checkUser(request=request, needToken=True)
     #Replace the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
@@ -82,7 +82,7 @@ async def helloPutter(filename:str, body:Textfile, request:Request)-> str:
 @statRoute.patch("/{filename}")
 async def helloPatcher(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
-    await checkToken(request=request)
+    await checkUser(request=request, needToken=True)
     #Append to the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
@@ -97,7 +97,7 @@ async def helloPatcher(filename:str, body:Textfile, request:Request)-> str:
 @statRoute.delete("/{filename}")
 async def helloRemover(filename:str, request:Request)-> str:
     #Ensure the user is logged in first
-    await checkToken(request=request)
+    await checkUser(request=request, needToken=True)
     #Remove the file
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params

@@ -12,7 +12,7 @@ class RegUser(BaseModel):
     password:str = Field(..., min_length=3, max_length=50) # 3 to 50 characters long
     passConf:str = Field(..., min_length=3, max_length=50)
     displayName:str = Field(..., min_length=1, max_length=30) # 1 to 30 characters long
-    activationCode:int
+    activationCode:str
     
     @field_validator("passConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:
@@ -35,7 +35,7 @@ class ChangeUserPass(BaseModel): # currently only allow changing password of log
     email:Optional[EmailStr] # Either log in or provide email and activation code
     newPass:str = Field(..., min_length=3, max_length=50)
     newPassConf:str = Field(..., min_length=3, max_length=50)
-    activationCode:Optional[int]
+    activationCode:Optional[str]
 
     @field_validator("newPassConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:

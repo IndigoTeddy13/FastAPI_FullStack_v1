@@ -40,11 +40,12 @@ def hashPassword(password):
     return pwd_context.hash(password)
 
 #Check anti-CSRF token on authenticated routes
-async def checkToken(request:Request):
+async def checkUser(request:Request, needToken:bool=False):
     if not(request.session and request.session.get("user")):
         raise HTTPException(status_code=403, detail="User isn't logged in properly. Log in and try again.")
-    if not(request.session.get("token")==request.headers.get("Anti-CSRF")):
+    if (needToken) and not(request.session.get("token")==request.headers.get("Anti-CSRF")):
         raise HTTPException(status_code=403, detail="User didn't provide the correct Anti-CSRF token in header. Fetch a new token and try again.")
+    return True
     
 
 # Account management route:
@@ -73,7 +74,7 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
     #Send email with activation code
     request.session["activation"] = {
         "email":normalizedEmail,
-        "code":int(uuid.uuid4())
+        "code":str(uuid.uuid4())
     }
     message = MessageSchema(
         subject="Activation code for: " +normalizedEmail,
@@ -87,12 +88,10 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
 @authRoute.post("/refresh-token")# Most likely called on page load and after login on frontend
 async def refreshToken(request:Request):
     #Check if a session is active
-    if(request.session and request.session.get("user")):
-        #Store new access token for comparison (invalidates old tokens)
-        request.session["token"] = "refreshed jwt"
-        return {"token": request.session["token"]} #return new access token
-    else:
-        raise HTTPException(status_code=401, detail="Login expired. Log in again.")  
+    await checkUser(request=request)
+    #Store new access token for comparison (invalidates old tokens)
+    request.session["token"] = str(uuid.uuid4())
+    return {"token": request.session["token"]} #return new access token
 
 @authRoute.post("/register")
 async def register(request:Request, user:RegUser):
@@ -103,7 +102,7 @@ async def register(request:Request, user:RegUser):
         "email":user.email,
         "code":user.activationCode
     })):
-        raise HTTPException(status_code=400, detail="Get a new activation code and try again!")
+        raise HTTPException(status_code=403, detail="Get a new activation code and try again!")
     
     #Check user's email isn't registered in DB
     newUser:UserEntry = UserEntry(
@@ -125,7 +124,7 @@ async def login(request:Request, user:LoginUser):
     # Check against main DB
     possibleEntry = await userColl.find_one({"email":str(user.email)}, {'_id': 0})
     if not(possibleEntry):
-        raise HTTPException(status_code=400, detail="Account doesn't exist. Activate your email and register first.")
+        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
     #Compare passwords
     possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
     if not(verifyPassword(plain_password=user.password, hashed_password=possibleUser.hash)):
@@ -141,16 +140,12 @@ async def login(request:Request, user:LoginUser):
 
 @authRoute.get("/profile")
 async def getProfile(request:Request):
-    #Check user is logged in
-    if not(request.session and request.session.get("user")):
-        raise HTTPException(status_code=400, detail="Log in to check your profile.")
-    if not(request.session["user"]):
-        raise HTTPException(status_code=400, detail="Log in to check your profile.")
+    await checkUser(request=request, needToken=True)
     
     #Retrieve full user info from main DB and format it accordingly
     possibleEntry = await userColl.find_one({"email":str(request.session["user"])}, {'_id': 0})
     if not(possibleEntry):
-        raise HTTPException(status_code=400, detail="Account doesn't exist. Activate your email and register first.")
+        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
     possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
     return {
         "email":possibleUser.email,
@@ -162,17 +157,22 @@ async def getProfile(request:Request):
 @authRoute.put("/change-password")
 async def changePassword(request:Request, user:ChangeUserPass):
     #Confirm user's email is activated
-    if(not(request.session)):
-        raise HTTPException(status_code=404, detail="Log in or activate your email first!")
-    if(not(request.session.get("user") or request.session.get("activation")=={
-        "email":user.email,
-        "code":user.activationCode
-    })):
-        raise HTTPException(status_code=400, detail="Get a new activation code and try again!")
+    try: #Is the user logged in?
+        await checkUser(request=request, needToken=True)
+    except:
+        #Is the user using an activated email because they forgot their password?
+        try: 
+            if(not(request.session.get("activation")=={
+                "email":user.email,
+                "code":user.activationCode
+            })):
+                raise HTTPException(status_code=403, detail="Get a new activation code or log in and try again!")
+        except Exception as e: #Catch the exception and raise it
+            raise (e)
     #check against main DB for requested user
     possibleEntry = await userColl.find_one({"email":str(user.email)}, {'_id': 0})
     if not(possibleEntry):
-        raise HTTPException(status_code=400, detail="Account doesn't exist. Activate your email and register first.")
+        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
     #change password if user exists
     possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
     await userColl.update_one(
@@ -185,12 +185,11 @@ async def changePassword(request:Request, user:ChangeUserPass):
 @authRoute.put("/change-name")
 async def changeName(request:Request, user:ChangeUserName):
     #Confirm user is logged in
-    if(not(request.session and request.session.get("user"))):
-        raise HTTPException(status_code=404, detail="Log in first!")
+    await checkUser(request=request, needToken=True)
     #check against main DB for requested user
     possibleEntry = await userColl.find_one({"email":str(request.session["user"])}, {'_id': 0})
     if not(possibleEntry):
-        raise HTTPException(status_code=400, detail="Account doesn't exist. Activate your email and register first.")
+        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
     #change password if user exists
     possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
     await userColl.update_one(
@@ -208,8 +207,7 @@ async def logout(request:Request):
 @authRoute.delete("/delete-account")
 async def deleteAccount(request:Request):
     #Confirm user is logged in
-    if(not(request.session and request.session.get("user"))):
-        raise HTTPException(status_code=404, detail="Log in first!")
+    await checkUser(request=request, needToken=True)
     #Remove user if user exists
     await userColl.find_one_and_delete({"email":str(request.session["user"])})
     request.session.clear()
