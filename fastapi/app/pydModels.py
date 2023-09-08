@@ -11,9 +11,9 @@ class RegUser(BaseModel):
     email:EmailStr
     password:str = Field(..., min_length=3, max_length=50) # 3 to 50 characters long
     passConf:str = Field(..., min_length=3, max_length=50)
-    displayName:str = Field(..., min_length=1, max_length=30) # 1 to 30 characters long
+    displayName:str = Field(..., min_length=1, max_length=30, pattern=r"^[a-zA-Z0-9_. ]$") # 1 to 30 characters long, alphanumeric, underscore, period, and whitespace only
     activationCode:str
-    
+
     @field_validator("passConf")
     def passwords_match(cls, v:str, info:FieldValidationInfo) -> str:
         if "password" in info.data and v != info.data["password"]:
@@ -44,4 +44,4 @@ class ChangeUserPass(BaseModel): # currently only allow changing password of log
         return v
 
 class ChangeUserName(BaseModel):
-    displayName:str = Field(..., min_length=1, max_length=30)
+    displayName:str = Field(..., min_length=1, max_length=30, pattern=r"^[a-zA-Z0-9_. ]$") # 1 to 30 characters long, alphanumeric, underscore, period, and whitespace only
