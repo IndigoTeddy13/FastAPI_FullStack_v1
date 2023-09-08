@@ -9,7 +9,7 @@ from .authRoute import checkUser
 from .drivers.mongo import *
 
 #Static text file route:
-statRoute = APIRouter()
+hellosRoute = APIRouter()
 staticDir:str = os.path.join(os.getcwd(), "app", "static")
 
 #Function to check if a filename is valid
@@ -20,7 +20,7 @@ def validateFilename(fName:str):
         raise HTTPException(status_code=400, detail="Not a valid name")
 
 #Static CRUD check
-@statRoute.get("/")
+@hellosRoute.get("/")
 async def allHellos() ->list:
     if (not(os.path.exists(staticDir))):
         os.makedirs(staticDir)#make directory if it doesn't exist
@@ -33,7 +33,7 @@ async def allHellos() ->list:
         return [s.strip(".txt") for s in helloList] # strip out the .txt suffixes
 
 #Request a specific greeting
-@statRoute.get("/{filename}")#greet person by name and return their request body
+@hellosRoute.get("/{filename}")#greet person by name and return their request body
 async def helloGetter(filename:str)-> FileResponse:
     validateFilename(filename) #validate filename before proceeding
     targetFile:str = staticDir +"/"+ filename+".txt" #request params
@@ -45,7 +45,7 @@ async def helloGetter(filename:str)-> FileResponse:
         raise HTTPException(status_code=404, detail="Item not found")
 
 #Post new file if name is unused
-@statRoute.post("/{filename}")
+@hellosRoute.post("/{filename}")
 async def helloPoster(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
     await checkUser(request=request, needToken=True)
@@ -64,7 +64,7 @@ async def helloPoster(filename:str, body:Textfile, request:Request)-> str:
         raise HTTPException(status_code=404, detail="Item already exists")
 
 #Overwrite specified file
-@statRoute.put("/{filename}")
+@hellosRoute.put("/{filename}")
 async def helloPutter(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
     await checkUser(request=request, needToken=True)
@@ -79,7 +79,7 @@ async def helloPutter(filename:str, body:Textfile, request:Request)-> str:
         raise HTTPException(status_code=404, detail="Item not found")
 
 #Add to specified file
-@statRoute.patch("/{filename}")
+@hellosRoute.patch("/{filename}")
 async def helloPatcher(filename:str, body:Textfile, request:Request)-> str:
     #Ensure the user is logged in first
     await checkUser(request=request, needToken=True)
@@ -94,7 +94,7 @@ async def helloPatcher(filename:str, body:Textfile, request:Request)-> str:
         raise HTTPException(status_code=404, detail="Item not found")
 
 #Delete specified file
-@statRoute.delete("/{filename}")
+@hellosRoute.delete("/{filename}")
 async def helloRemover(filename:str, request:Request)-> str:
     #Ensure the user is logged in first
     await checkUser(request=request, needToken=True)

@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
 #Personal imports
-from .statRoute import *
+from .helloRoute import *
 from .authRoute import *
 from .pydModels import *
 from .drivers.mongo import *
@@ -49,7 +49,7 @@ middlewareList:list=[
 app = FastAPI(middleware=middlewareList) #initialize FastAPI
 
 #Static file management router
-app.include_router(statRoute, prefix="/static")
+app.include_router(hellosRoute, prefix="/hellos")
 
 #MongoDB management router
 app.include_router(authRoute, prefix="/auth")
