@@ -58,5 +58,5 @@ app.include_router(authRoute, prefix="/auth")
 
 #Request a Hello World JSON
 @app.get("/")
-async def helloWorld()-> dict:
+async def helloWorld():
     return {"Hello":"World"}

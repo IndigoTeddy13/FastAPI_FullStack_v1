@@ -90,7 +90,7 @@ async def refreshToken(request:Request):
     await checkUser(request=request)
     #Store new access token for comparison (invalidates old tokens)
     request.session["token"] = str(uuid.uuid4())
-    return {"token": request.session["token"]} #return new access token
+    return request.session["token"] #return new access token
 
 @authRoute.post("/register")
 async def register(request:Request, user:RegUser):
@@ -114,6 +114,10 @@ async def register(request:Request, user:RegUser):
         raise HTTPException(status_code=409, detail="User already registered")
     #Add to DB
     await userColl.insert_one(newUser.model_dump())
+
+    # Clear pre-existing session to ensure activation code gets invalidated
+    if(request.session):
+        request.session.clear()
 
     #redirect user to login
     return "Registered. Now log into your account!"

@@ -3,7 +3,12 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, field_validator #Models used in personal model definitions
 from pydantic_core.core_schema import FieldValidationInfo
 
-class Textfile(BaseModel):
+#Markdown file classes
+class Markdown(BaseModel):
+    content:str #input is markdown string
+
+class MarkdownEntry(BaseModel):
+    fName:str
     content:str
 
 #Account classes
@@ -23,7 +28,7 @@ class RegUser(BaseModel):
 class UserEntry(BaseModel):
     email:EmailStr
     hash:str # store hash of password here
-    displayName:str = Field(..., min_length=1, max_length=30)
+    displayName:str = Field(..., min_length=1, max_length=30, pattern=r"^[a-zA-Z0-9_. ]$")
     created:datetime = datetime.utcnow()
     admin:bool=False #default not an admin
 

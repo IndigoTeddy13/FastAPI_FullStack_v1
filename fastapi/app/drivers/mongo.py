@@ -6,8 +6,7 @@ FastAPI_DB:str = str(os.getenv("MONGODB_INITDB_DATABASE"))
 
 #MongoDB setup
 #Format URL:
-mongoTemp:str = "mongodb://{user}:{password}@{domain}:{port}/{dbname}?authSource={user}"
-mongoURL:str = mongoTemp.format(
+mongoURL:str = "mongodb://{user}:{password}@{domain}:{port}/{dbname}?authSource={user}".format(
     user=str(os.getenv("MONGODB_INITDB_ROOT_USERNAME")),
     password=str(os.getenv("MONGODB_INITDB_ROOT_PASSWORD")),
     domain=str(os.getenv("MONGO_DOMAIN")),
