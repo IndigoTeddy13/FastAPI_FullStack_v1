@@ -1,4 +1,4 @@
-# TestingFastAPIv1
+#  FastAPI_FullStack_v1
 My first fullstack app. FastAPI is the backend. NGINX is the reverse proxy and static server. Svelte or another frontend framework (TBD). MongoDB is the primary database. Redis for session storage. Dockerized.
 Currently WIP.
 
