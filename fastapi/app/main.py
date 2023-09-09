@@ -1,14 +1,11 @@
 #Imports
 #from typing import Any, Dict, List, Union #different types
-from fastapi import Depends, FastAPI, HTTPException #FastAPI stuff
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI #FastAPI stuff
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
 #Personal imports
-from .helloRoute import *
-from .authRoute import *
-from .pydModels import *
-from .drivers.mongo import *
+from .helloRoute import helloRoute
+from .authRoute import authRoute
 from .drivers.redis import redisURL
 #Redis Session Storage configuration
 from starsessions import SessionMiddleware, SessionAutoloadMiddleware
@@ -49,7 +46,7 @@ middlewareList:list=[
 app = FastAPI(middleware=middlewareList) #initialize FastAPI
 
 #Static file management router
-app.include_router(hellosRoute, prefix="/hellos")
+app.include_router(helloRoute, prefix="/hellos")
 
 #MongoDB management router
 app.include_router(authRoute, prefix="/auth")

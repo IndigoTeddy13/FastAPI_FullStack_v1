@@ -59,7 +59,7 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
     #Check if email string is valid
     normalizedEmail:EmailStr
     try:
-        emailinfo:object = validate_email(
+        emailinfo = validate_email(
             email=email,
             check_deliverability=True
         )
@@ -68,7 +68,7 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
         raise HTTPException(status_code=400, detail=(str(e)))
     #Ensure email isn't disposable
     if await checker.is_disposable(normalizedEmail):
-        HTTPException(status_code=400, detail="No disposable emails allowed.")
+        HTTPException(status_code=400, detail="No disposable emails are allowed.")
     
     #Send email with activation code
     request.session["activation"] = {
@@ -82,7 +82,7 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
         subtype=MessageType.html)
     fm = FastMail(conf)
     await fm.send_message(message)
-    return "Email sent with activation code"
+    return "An email was sent with your activation code!"
 
 @authRoute.post("/refresh-token")# Most likely called on page load and after login on frontend
 async def refreshToken(request:Request):
@@ -111,7 +111,7 @@ async def register(request:Request, user:RegUser):
     )
     possibleUser = await userColl.find_one({"email":str(user.email)})
     if (possibleUser):
-        raise HTTPException(status_code=409, detail="User already registered")
+        raise HTTPException(status_code=409, detail="Another user already registered with your email.")
     #Add to DB
     await userColl.insert_one(newUser.model_dump())
 
@@ -120,7 +120,7 @@ async def register(request:Request, user:RegUser):
         request.session.clear()
 
     #redirect user to login
-    return "Registered. Now log into your account!"
+    return "Registered successfully! Now log into your account!"
 
 @authRoute.post("/login")
 async def login(request:Request, user:LoginUser):
@@ -199,7 +199,7 @@ async def changeName(request:Request, user:ChangeUserName):
         {'email': possibleUser.email},
         {'$set': {'displayName': user.displayName}}
     )
-    return "Name changed to " +user.displayName+ "!"
+    return "Name changed to {newName} successfully!".format(newName=user.displayName)
 
 @authRoute.delete("/logout")
 async def logout(request:Request):

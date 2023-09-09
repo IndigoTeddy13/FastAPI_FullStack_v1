@@ -17,9 +17,11 @@ mongoURL:str = "mongodb://{user}:{password}@{domain}:{port}/{dbname}?authSource=
 mongoClient = AsyncIOMotorClient(mongoURL)
 
 #Convert an inputted AsyncIOMotorCursor (such as a query) to a Python dictionary
-async def queryToDict(c): # Input the query
+async def queryManyToDict(c): # Input the query
+    myList:list = []
     async for document in c:
-        pprint.pprint(document) # The output is formatted into a dictionary
+        myList.append(document)
+    return myList
 
 #Test function
 async def testMongo():
