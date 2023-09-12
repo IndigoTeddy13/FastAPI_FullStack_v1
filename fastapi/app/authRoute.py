@@ -39,7 +39,7 @@ def hashPassword(password):
     return pwd_context.hash(password)
 
 #Check anti-CSRF token on authenticated routes
-async def checkUser(request:Request, needToken:bool=False):
+def checkUser(request:Request, needToken:bool=False):
     if not(request.session and request.session.get("user")):
         raise HTTPException(status_code=403, detail="User isn't logged in properly. Log in and try again.")
     if (needToken) and not(request.session.get("token")==request.headers.get("Anti-CSRF")):
@@ -87,7 +87,7 @@ async def activateEmail(request:Request, email:EmailStr, checker:DefaultChecker=
 @authRoute.post("/refresh-token")# Most likely called on page load and after login on frontend
 async def refreshToken(request:Request):
     #Check if a session is active
-    await checkUser(request=request)
+    checkUser(request=request)
     #Store new access token for comparison (invalidates old tokens)
     request.session["token"] = str(uuid.uuid4())
     return request.session["token"] #return new access token
@@ -149,7 +149,7 @@ async def register(request:Request, user:RegUser):
 
 @authRoute.get("/profile")
 async def getProfile(request:Request):
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     
     #Retrieve full user info from main DB and format it accordingly
     possibleEntry = await userColl.find_one({"email":str(request.session["user"])}, {'_id': 0})
@@ -167,7 +167,7 @@ async def getProfile(request:Request):
 async def changePassword(request:Request, user:ChangeUserPass):
     #Confirm user's email is activated
     try: #Is the user logged in?
-        await checkUser(request=request, needToken=True)
+        checkUser(request=request, needToken=True)
     except:
         #Is the user using an activated email because they forgot their password?
         try: 
@@ -194,7 +194,7 @@ async def changePassword(request:Request, user:ChangeUserPass):
 @authRoute.put("/change-name")
 async def changeName(request:Request, user:ChangeUserName):
     #Confirm user is logged in
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #check against main DB for requested user
     possibleEntry = await userColl.find_one({"email":str(request.session["user"])}, {'_id': 0})
     if not(possibleEntry):
@@ -216,7 +216,7 @@ async def logout(request:Request):
 @authRoute.delete("/delete-account")
 async def deleteAccount(request:Request):
     #Confirm user is logged in
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #Remove user if user exists
     await userColl.find_one_and_delete({"email":str(request.session["user"])})
     request.session.clear()

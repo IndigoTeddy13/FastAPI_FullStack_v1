@@ -59,7 +59,7 @@ async def helloGetter(filename:str):
 @helloRoute.post("/{filename}")
 async def helloPoster(filename:str, body:Markdown, request:Request):
     #Ensure the user is logged in first
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #Write the file
     validateFilename(filename) #validate filename before proceeding
     #Find a greeting if it exists:
@@ -81,7 +81,7 @@ async def helloPoster(filename:str, body:Markdown, request:Request):
 @helloRoute.put("/{filename}")
 async def helloPutter(filename:str, body:Markdown, request:Request):
     #Ensure the user is logged in first
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #Replace the file
     validateFilename(filename) #validate filename before proceeding
     #Find a greeting if it exists:
@@ -102,7 +102,7 @@ async def helloPutter(filename:str, body:Markdown, request:Request):
 @helloRoute.patch("/{filename}")
 async def helloPatcher(filename:str, body:Markdown, request:Request):
     #Ensure the user is logged in first
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #Append to the file
     validateFilename(filename) #validate filename before proceeding
     #Find a greeting if it exists:
@@ -127,7 +127,7 @@ async def helloPatcher(filename:str, body:Markdown, request:Request):
 @helloRoute.delete("/{filename}")
 async def helloRemover(filename:str, request:Request):
     #Ensure the user is logged in first
-    await checkUser(request=request, needToken=True)
+    checkUser(request=request, needToken=True)
     #Remove the file
     validateFilename(filename) #validate filename before proceeding
     #Find a greeting if it exists:

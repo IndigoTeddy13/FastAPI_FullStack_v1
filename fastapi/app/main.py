@@ -1,6 +1,6 @@
 #Imports
-#from typing import Any, Dict, List, Union #different types
-from fastapi import FastAPI #FastAPI stuff
+import os, json
+from fastapi import FastAPI, HTTPException, Request #FastAPI stuff
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware #Allow CORS
 #Personal imports
@@ -45,7 +45,19 @@ middlewareList:list=[
 #Server Initialization
 app = FastAPI(middleware=middlewareList) #initialize FastAPI
 
-#Static file management router
+# #Custom middleware to check headers for valid API key
+# @app.middleware("http")
+# async def validateServer(request: Request, call_next):
+#     apiKey:str = str(os.getenv("API_KEY"))
+#     receivedKey:str = str(request.headers.get("API-Key"))
+#     if(receivedKey == apiKey):
+#         response = await(call_next(request))
+#         return response
+#     else:
+#         raise HTTPException(status_code=403, detail="Provide a valid API key in your headers.")
+    
+
+#Greetings management router
 app.include_router(helloRoute, prefix="/hellos")
 
 #MongoDB management router
