@@ -1,21 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <!--AAA-->
-        <link rel="icon" type="image/x-icon" href="data:;base64,iVBORw0KGgo=" />
+        <title>Sample App</title>
+        <link rel="icon" type="image/x-icon" href="data:;base64,iVBORw0KGgo=">
+        <script defer src="./index.js"></script>
     </head>
     <body>
-        <!--Login Form-->
-        <form onsubmit="return false" id="loginForm">
-            <p><strong>Login</strong></p>
-            <input type="text" placeholder="Enter Email" id="email_log" maxlength="30">
-            <input type="text" placeholder="Enter Password" id="password_log" maxlength="50">
-            <button type="submit" id="loginBtn">Submit</button>
-        </form>
-        <br/>
+        <div id="accountMakers" hidden>
+            <!--Activation Form-->
+            <form onsubmit="return false" id="activateForm">
+                <p><strong>Activate Your Email</strong></p>
+                <input type="text" placeholder="Enter Email" id="email_act">
+                <button type="submit" id="actBtn">Activate</button>
+            </form>
 
-        <p>Hiya!</p>
-        <button id="aaaaaa">Press to say Hi to the Server!</button>
+            <!--Registry Form-->
+            <form onsubmit="return false" id="registerForm">
+                <p><strong>Register</strong></p>
+                <input type="text" placeholder="Enter Email" id="email_reg">
+                <input type="password" placeholder="Enter Password" id="password_reg" maxlength="50">
+                <input type="password" placeholder="Enter Password Again" id="passConf_reg" maxlength="50">
+                <input type="text" placeholder="Enter Display Name" id="name_reg" maxlength="30">
+                <input type="password" placeholder="Enter Confirmation Code" id="activation_reg">
+                <button type="submit" id="regBtn">Submit</button>
+            </form>
+
+            <!--Login Form-->
+            <form onsubmit="return false" id="loginForm">
+                <p><strong>Login</strong></p>
+                <input type="text" placeholder="Enter Email" id="email_log">
+                <input type="password" placeholder="Enter Password" id="password_log" maxlength="50">
+                <button type="submit" id="loginBtn">Submit</button>
+            </form>
+
+            <!--Change Password Form 1-->
+            <form onsubmit="return false" id="changePasswordForm_1">
+                <p><strong>Change Password</strong></p>
+                <input type="text" placeholder="Enter Email" id="email_new">
+                <input type="password" placeholder="Enter New Password" id="newPass_1" maxlength="50">
+                <input type="password" placeholder="Enter New Password Again" id="newPassConf_1" maxlength="50">
+                <input type="password" placeholder="Enter Confirmation Code" id="activation_new">
+                <button type="submit" id="changePassBtn">Submit</button>
+            </form>
+        </div>
+        <button id="logout">Logout</button>
+
+        <h1>Hiya</h1>
+
+        <div id="accountManagers" hidden>
+            <!---->
+            <button type="submit" id="removeAccount">Delete Account</button>
+            <button type="submit" id="displayProfile">Display Profile</button>
+
+            <div id="profileDiv">
+                <p></p>
+            </div>
+            
+            <!--Change Display Name Form-->
+            <form onsubmit="return false" id="changeNameForm">
+                <p><strong>Change Your Display Name</strong></p>
+                <input type="text" placeholder="Enter New Display Name" id="new_name" maxlength="30">
+                <button type="submit" id="changeNameBtn">Activate</button>
+            </form>
+
+            <!--Change Password Form 2-->
+            <form onsubmit="return false" id="changePasswordForm_2">
+                <p><strong>Change Password</strong></p>
+                <input type="password" placeholder="Enter New Password" id="newPass_2" maxlength="50">
+                <input type="password" placeholder="Enter New Password Again" id="newPassConf_2" maxlength="50">
+                <button type="submit" id="changePassBtn_2">Submit</button>
+            </form>
+        </div>
     </body>
-    <script src="./index.js"></script>
 </html>

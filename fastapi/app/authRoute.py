@@ -92,6 +92,25 @@ async def refreshToken(request:Request):
     request.session["token"] = str(uuid.uuid4())
     return request.session["token"] #return new access token
 
+@authRoute.post("/login")
+async def login(request:Request, user:LoginUser):
+    # Check against main DB
+    possibleEntry = await userColl.find_one({"email":str(user.email)}, {'_id': 0})
+    if not(possibleEntry):
+        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
+    #Compare passwords
+    possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
+    if not(verifyPassword(plain_password=user.password, hashed_password=possibleUser.hash)):
+        raise HTTPException(status_code=400, detail="Password is wrong. Try again or activate your email to change your password.")
+    
+    # Clear pre-existing session if re-logging in to ensure the older access token gets invalidated
+    if(request.session):
+        request.session.clear()
+
+    #Start a new session
+    request.session["user"] = possibleUser.email
+    return await refreshToken(request=request)
+
 @authRoute.post("/register")
 async def register(request:Request, user:RegUser):
     #Check if activation codes match
@@ -120,26 +139,13 @@ async def register(request:Request, user:RegUser):
         request.session.clear()
 
     #redirect user to login
-    return "Registered successfully! Now log into your account!"
-
-@authRoute.post("/login")
-async def login(request:Request, user:LoginUser):
-    # Check against main DB
-    possibleEntry = await userColl.find_one({"email":str(user.email)}, {'_id': 0})
-    if not(possibleEntry):
-        raise HTTPException(status_code=404, detail="Account doesn't exist. Activate your email and register first.")
-    #Compare passwords
-    possibleUser:UserEntry = UserEntry.model_validate(possibleEntry)
-    if not(verifyPassword(plain_password=user.password, hashed_password=possibleUser.hash)):
-        raise HTTPException(status_code=400, detail="Password is wrong. Try again or activate your email to change your password.")
-    
-    # Clear pre-existing session if re-logging in to ensure the older access token gets invalidated
-    if(request.session):
-        request.session.clear()
-
-    #Start a new session
-    request.session["user"] = possibleUser.email
-    return await refreshToken(request=request)
+    return await login(
+        request=request,
+        user=LoginUser(
+            email=user.email,
+            password=user.password
+        )
+    )
 
 @authRoute.get("/profile")
 async def getProfile(request:Request):
@@ -205,7 +211,7 @@ async def changeName(request:Request, user:ChangeUserName):
 async def logout(request:Request):
     #clear session, which invalidates access tokens automatically
     request.session.clear() 
-    return "logged out"
+    return "Logged out successfully!"
 
 @authRoute.delete("/delete-account")
 async def deleteAccount(request:Request):

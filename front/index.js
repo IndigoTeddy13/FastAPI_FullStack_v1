@@ -1,10 +1,6 @@
-const loginForm = document.getElementById("loginForm")
-const registerForm = document.getElementById("registerForm")
-const aaaBtn = document.getElementById("aaaaaa");
-let auth_token = null;//set on page load if logged in
-
+//Helper functions:
 async function fetcher(url, method, body){
-    let response = await fetch(url,{
+    return await fetch(url,{
         method:method,
         mode:"cors",
         credentials:"include",
@@ -15,51 +11,85 @@ async function fetcher(url, method, body){
         redirect:"follow",
         body:JSON.stringify(body)
     });
-    return response.json();
-} 
-
-async function healthCheck() {
-    let response = await fetch("/api");//proxy to /api/
-    if(response.ok){
-        let results = await response.json();
-        console.log(results);
-        alert(JSON.stringify(results));
+}
+async function alerter(response, securify, warnify){
+    if(response.ok){//notify unless told to hide confidential data
+        let content = await response.json();
+        if(!securify) alert(JSON.stringify(content, null, "\t"));
+        return content;
     }
-    else{
-        console.log(response.status);
-        console.log(response.statusText);
+    else{//warn unless told to hide warning
+        let content = await response.json();
+        if(!warnify) alert(`${response.status}: ${response.statusText}\n${JSON.stringify(content, null, "\t")}`);
+        return null;
     }
 }
 
-/*async function hideForms(hiddenStates){
-    switch(hiddenStates){
-        case "Register":
-            loginForm.hidden = true;
-            registerForm.hidden = false;
-            break;
-        case "Login":
-            loginForm.hidden = false;
-            registerForm.hidden = true;
-            break; 
-        case "Logout":
-            let logoutResp = await fetch("/api/auth/logout");
-            console.log(logoutResp);
-            hideForms("Login");
-            break;
-        default:
-            loginForm.hidden = true;
-            break;
+//Values
+let accountMakers = document.getElementById("accountMakers");
+let accountManagers = document.getElementById("accountManagers");
+let activateForm = document.getElementById("activateForm");
+let emailActInput = document.getElementById("email_act");
+let registerForm = document.getElementById("registerForm");
+let loginForm = document.getElementById("loginForm");
+let auth_token = null;//set on page load if logged in
+
+//Form Hider
+async function hideForms(flag){
+    if(!flag) {
+        accountMakers.hidden = true
+        accountManagers.hidden = false
     }
-}*/
-/*
-case "Logout":
-    let logoutResp = await fetch("/api/auth/logout");
-    console.log(logoutResp);
-    hideForms("Login");
-*/ 
-aaaBtn.addEventListener("click", healthCheck);
+    else {
+        accountMakers.hidden = false
+        accountManagers.hidden = true
+    }
+}
+
+//Event Listeners
+window.addEventListener("load", async function(){
+    let loadResp = await fetcher("/api/auth/refresh-token", "POST", {})
+    auth_token = await alerter(loadResp, true, true)
+    //hide
+    if(auth_token) await hideForms();
+    else await hideForms(true);
+})
+activateForm.addEventListener("submit", async function(){
+    let email = String(emailActInput.value);
+    let actResp = await fetcher("/api/auth/activate/"+email, "POST", {});
+    await alerter(actResp)
+})
+registerForm.addEventListener("submit", async function(){
+    let regResp = await fetcher("/api/auth/register", "POST", {
+        "email":document.getElementById("email_reg").value,
+        "password":document.getElementById("password_reg").value,
+        "passConf":document.getElementById("passConf_reg").value,
+        "displayName":document.getElementById("name_reg").value,
+        "activationCode":document.getElementById("activation_reg").value
+    });
+    auth_token = await alerter(regResp, true)
+    if(auth_token){
+        alert("Registered successfully!");
+        //hide
+        await hideForms();
+    } 
+});
 loginForm.addEventListener("submit", async function(){
-    let loginResp = await fetcher("/api/auth/login", "POST", {});
-    console.log(loginResp);
-    //hideForms(null);
+    let loginResp = await fetcher("/api/auth/login", "POST", {
+        "email":document.getElementById("email_log").value,
+        "password":document.getElementById("password_log").value
+    });
+    auth_token = await alerter(loginResp, true)
+    if(auth_token) {
+        alert("Logged in successfully!")
+        //hide
+        await hideForms();
+    }
+});
+
+document.getElementById("logout").addEventListener("click", async function(){
+    let logoutResp = await fetcher("/api/auth/logout", "DELETE", {})
+    await alerter(logoutResp)
+    //unhide
+    await hideForms(true);
 });
